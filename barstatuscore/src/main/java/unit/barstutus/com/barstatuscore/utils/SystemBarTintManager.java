@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2013 readyState Software Ltd
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package unit.barstutus.com.barstatuscore.utils;
 
 import android.annotation.SuppressLint;
@@ -22,24 +38,16 @@ import android.widget.FrameLayout.LayoutParams;
 import java.lang.reflect.Method;
 
 /**
- * 项目名称：BarStutusProject
- * 类描述：转载github代码
- * Android allows a system property to override the presence of the navigation bar.
- * Used by the emulator.
- * See https://github.com/android/platform_frameworks_base/blob/master/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java#L1076
- * 创建人：maw@neuqsoft.com
- * 创建时间： 2018/12/12 9:25
- * 修改备注
+ * Class to manage status and navigation bar tint effects when using KitKat 
+ * translucent system UI modes.
+ *
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
 public class SystemBarTintManager {
 
-    /**
-     * Class to manage status and navigation bar tint effects when using KitKat
-     * translucent system UI modes.
-     *
-     */
     static {
+        // Android allows a system property to override the presence of the navigation bar.
+        // Used by the emulator.
+        // See https://github.com/android/platform_frameworks_base/blob/master/policy/src/com/android/internal/policy/impl/PhoneWindowManager.java#L1076
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             try {
                 Class c = Class.forName("android.os.SystemProperties");
@@ -52,11 +60,14 @@ public class SystemBarTintManager {
         }
     }
 
+
     /**
      * The default system bar tint color value.
      */
     public static final int DEFAULT_TINT_COLOR = 0x99000000;
+
     private static String sNavBarOverride;
+
     private final SystemBarConfig mConfig;
     private boolean mStatusBarAvailable;
     private boolean mNavBarAvailable;
@@ -72,13 +83,14 @@ public class SystemBarTintManager {
      *
      * @param activity The host activity.
      */
-    @SuppressLint("ResourceType")
     @TargetApi(19)
     public SystemBarTintManager(Activity activity) {
+
         Window win = activity.getWindow();
         ViewGroup decorViewGroup = (ViewGroup) win.getDecorView();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-// check theme attrs
+            // check theme attrs
             int[] attrs = {android.R.attr.windowTranslucentStatus,
                     android.R.attr.windowTranslucentNavigation};
             TypedArray a = activity.obtainStyledAttributes(attrs);
@@ -88,7 +100,8 @@ public class SystemBarTintManager {
             } finally {
                 a.recycle();
             }
-// check window flags
+
+            // check window flags
             WindowManager.LayoutParams winParams = win.getAttributes();
             int bits = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
             if ((winParams.flags & bits) != 0) {
@@ -99,22 +112,25 @@ public class SystemBarTintManager {
                 mNavBarAvailable = true;
             }
         }
+
         mConfig = new SystemBarConfig(activity, mStatusBarAvailable, mNavBarAvailable);
-// device might not have virtual navigation keys
+        // device might not have virtual navigation keys
         if (!mConfig.hasNavigtionBar()) {
             mNavBarAvailable = false;
         }
+
         if (mStatusBarAvailable) {
             setupStatusBarView(activity, decorViewGroup);
         }
         if (mNavBarAvailable) {
             setupNavBarView(activity, decorViewGroup);
         }
+
     }
 
     /**
      * Enable tinting of the system status bar.
-     * <p>
+     *
      * If the platform is running Jelly Bean or earlier, or translucent system
      * UI modes have not been enabled in either the theme or via window flags,
      * then this method does nothing.
@@ -130,7 +146,7 @@ public class SystemBarTintManager {
 
     /**
      * Enable tinting of the system navigation bar.
-     * <p>
+     *
      * If the platform does not have soft navigation keys, is running Jelly Bean
      * or earlier, or translucent system UI modes have not been enabled in either
      * the theme or via window flags, then this method does nothing.
@@ -335,13 +351,16 @@ public class SystemBarTintManager {
     /**
      * Class which describes system bar sizing and other characteristics for the current
      * device configuration.
+     *
      */
     public static class SystemBarConfig {
+
         private static final String STATUS_BAR_HEIGHT_RES_NAME = "status_bar_height";
         private static final String NAV_BAR_HEIGHT_RES_NAME = "navigation_bar_height";
         private static final String NAV_BAR_HEIGHT_LANDSCAPE_RES_NAME = "navigation_bar_height_landscape";
         private static final String NAV_BAR_WIDTH_RES_NAME = "navigation_bar_width";
         private static final String SHOW_NAV_BAR_RES_NAME = "config_showNavigationBar";
+
         private final boolean mTranslucentStatusBar;
         private final boolean mTranslucentNavBar;
         private final int mStatusBarHeight;
@@ -412,7 +431,7 @@ public class SystemBarTintManager {
             int resourceId = res.getIdentifier(SHOW_NAV_BAR_RES_NAME, "bool", "android");
             if (resourceId != 0) {
                 boolean hasNav = res.getBoolean(resourceId);
-// check override flag (see static block)
+                // check override flag (see static block)
                 if ("1".equals(sNavBarOverride)) {
                     hasNav = false;
                 } else if ("0".equals(sNavBarOverride)) {
@@ -439,7 +458,7 @@ public class SystemBarTintManager {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 activity.getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
             } else {
-// TODO this is not correct, but we don't really care pre-kitkat
+                // TODO this is not correct, but we don't really care pre-kitkat
                 activity.getWindowManager().getDefaultDisplay().getMetrics(metrics);
             }
             float widthDp = metrics.widthPixels / metrics.density;
@@ -540,5 +559,7 @@ public class SystemBarTintManager {
                 return 0;
             }
         }
+
     }
+
 }

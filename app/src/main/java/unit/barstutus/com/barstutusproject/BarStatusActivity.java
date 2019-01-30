@@ -1,10 +1,10 @@
 package unit.barstutus.com.barstutusproject;
 
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import unit.barstutus.com.barstatuscore.SystemBarColor;
-import unit.barstutus.com.barstatuscore.utils.SystemBarTintManager;
 
 public class BarStatusActivity extends AppCompatActivity {
 
@@ -13,6 +13,6 @@ public class BarStatusActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar_status);
         //使用方式
-        SystemBarColor.parseColor(this,R.color.colorPrimaryDark);
+        SystemBarColor.parseColor(this, Color.RED);
     }
 }
